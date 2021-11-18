@@ -18,7 +18,7 @@ var shorts = make(map[int]URLs)
 
 var ID = 1
 
-func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	id := &ID
 	switch r.Method {
 	case "POST":
@@ -29,7 +29,7 @@ func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, params httpro
 			return
 		}
 		long := string(body)
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(201)
 		short := shorter.Shorting(*id)
 		shorts[*id] = URLs{
@@ -41,8 +41,8 @@ func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, params httpro
 	}
 }
 
-func GetURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	param := params.ByName("id")
+func GetURLById(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	param := r.URL.Path[len("http://localhost:8080/"):]
 	id, err := strconv.Atoi(param)
 	if err != nil {
 		http.Error(w, "Wrong", 400)
@@ -55,13 +55,15 @@ func GetURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params
 		return
 	}
 	w.WriteHeader(307)
+	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Location", long)
+	w.Write([]byte(""))
 }
 
 func main() {
 	router := httprouter.New()
 	router.POST("/", CreateShortURLHandler)
-	router.GET("/:id", GetURLById)
+	router.GET("/{id}", GetURLById)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -12,7 +12,7 @@ import "fmt"
 //	return string(b)
 //}
 
-const endpoint = "http://localhost/"
+const endpoint = "http://localhost:8080/"
 
 func Shorting(id int) string {
 	return fmt.Sprintf("%s%d", endpoint, id)
