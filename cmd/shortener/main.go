@@ -27,7 +27,7 @@ func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, params httpro
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	w.WriteHeader(201)
+	w.WriteHeader(200)
 	short := fmt.Sprintf("%s%d", prefix, id)
 	shorts[*id] = URLs{
 		Long: string(long),
