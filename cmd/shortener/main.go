@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"github.com/lekan-pvp/incr1/internal/app/shorter"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 )
-
-const prefix = "localhost:8080/"
 
 type URLs struct {
 	Long string
@@ -22,42 +20,48 @@ var ID = 1
 
 func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	id := &ID
-	long, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+	switch r.Method {
+	case "POST":
+		defer r.Body.Close()
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		long := string(body)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(201)
+		short := shorter.Shorting(*id)
+		shorts[*id] = URLs{
+			Long: long,
+			Short: short,
+		}
+		*id++
+		w.Write([]byte(short))
 	}
-	w.WriteHeader(200)
-	short := fmt.Sprintf("%s%d", prefix, id)
-	shorts[*id] = URLs{
-		Long: string(long),
-		Short: short,
-	}
-	*id++
-	_, err = w.Write([]byte(short))
 }
 
-func GetShortURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	id, err := strconv.Atoi(params.ByName("id"))
-
-	log.Println(id)
-
+func GetURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	param := params.ByName("id")
+	id, err := strconv.Atoi(param)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, "Wrong", 400)
+		return
+	}
+
+	long := shorts[id].Long
+	if long == "" {
+		http.Error(w, "Wrong id", 400)
 		return
 	}
 	w.WriteHeader(307)
-	w.Header().Set("Location", shorts[id].Long)
-	_, err = w.Write([]byte(""))
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
+	w.Header().Set("Location", long)
 }
 
 func main() {
 	router := httprouter.New()
 	router.POST("/", CreateShortURLHandler)
-	router.GET("/:id", GetShortURLById)
+	router.GET("/:id", GetURLById)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
