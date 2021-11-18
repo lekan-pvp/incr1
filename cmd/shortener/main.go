@@ -16,7 +16,7 @@ type URLs struct {
 	Short string
 }
 
-var shorts map[int]URLs
+var shorts map[int]*URLs
 
 var ID = 1
 
@@ -29,7 +29,7 @@ func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, params httpro
 	}
 	w.WriteHeader(200)
 	short := fmt.Sprintf("%s%d", prefix, id)
-	shorts[*id] = URLs{
+	shorts[*id] = &URLs{
 		Long: string(long),
 		Short: short,
 	}
