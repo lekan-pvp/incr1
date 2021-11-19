@@ -41,7 +41,7 @@ func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, _ httprouter.
 	}
 }
 
-func GetURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func GetURLByID(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	param := params.ByName("id")
 	log.Println(param)
 	id, err := strconv.Atoi(param)
@@ -68,7 +68,7 @@ func GetURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params
 func main() {
 	router := httprouter.New()
 	router.POST("/", CreateShortURLHandler)
-	router.GET("/:id", GetURLById)
+	router.GET("/:id", GetURLByID)
 
 	log.Fatal(http.ListenAndServe("localhost:8080", router))
 }
