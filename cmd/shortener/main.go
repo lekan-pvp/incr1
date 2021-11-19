@@ -43,6 +43,7 @@ func CreateShortURLHandler(w http.ResponseWriter, r *http.Request, _ httprouter.
 
 func GetURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	param := params.ByName("id")
+	log.Println(param)
 	id, err := strconv.Atoi(param)
 	log.Println(id)
 	if err != nil {
@@ -56,9 +57,12 @@ func GetURLById(w http.ResponseWriter, r *http.Request, params httprouter.Params
 		http.Error(w, "Wrong id", 400)
 		return
 	}
-	w.WriteHeader(307)
+
+
 	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Add("Location", long)
+	w.Header().Set("Location", long)
+	w.WriteHeader(http.StatusTemporaryRedirect)
+	//w.Write([]byte(""))
 }
 
 func main() {
@@ -66,5 +70,5 @@ func main() {
 	router.POST("/", CreateShortURLHandler)
 	router.GET("/:id", GetURLById)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe("localhost:8080", router))
 }
