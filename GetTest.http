@@ -1,4 +1,4 @@
-GET http://localhost:8080/2
+GET http://localhost:8080/1
 Accept: text/plain
 
 ###
