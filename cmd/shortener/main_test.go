@@ -54,8 +54,7 @@ func TestGetURLByID(t *testing.T) {
 				router := httprouter.New()
 				router.GET("/:id", GetURLByID)
 
-				req, err := http.NewRequest(http.MethodGet, tt.request, nil)
-				assert.NoError(t, err)
+				req := httptest.NewRequest(http.MethodGet, tt.request, nil)
 
 				rr := httptest.NewRecorder()
 
@@ -65,6 +64,50 @@ func TestGetURLByID(t *testing.T) {
 				defer result.Body.Close()
 				assert.Equal(t, tt.want.statusCode, result.StatusCode)
 			}
+		})
+	}
+}
+
+func TestCreateShortURLHandler(t *testing.T) {
+	type want struct {
+		statusCode int
+	}
+	tests := []struct {
+		name string
+		request string
+		want want
+	}{
+		{
+			name: "success",
+			request: "/",
+			want: want{
+				statusCode: 201,
+			},
+		},
+		{
+			name: "wrong endpoint",
+			request: "/wrong",
+			want: want{
+				statusCode: 404,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			router := httprouter.New()
+			router.POST("/", CreateShortURLHandler)
+
+			req := httptest.NewRequest(http.MethodPost, tt.request, nil)
+
+			rr := httptest.NewRecorder()
+
+			router.ServeHTTP(rr, req)
+
+			result := rr.Result()
+			defer result.Body.Close()
+
+			assert.Equal(t, tt.want.statusCode, result.StatusCode)
+
 		})
 	}
 }
