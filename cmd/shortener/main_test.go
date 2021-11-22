@@ -62,7 +62,7 @@ func TestGetURLByID(t *testing.T) {
 				router.ServeHTTP(rr, req)
 
 				result := rr.Result()
-
+				defer result.Body.Close()
 				assert.Equal(t, tt.want.statusCode, result.StatusCode)
 			}
 		})
