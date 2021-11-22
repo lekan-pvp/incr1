@@ -32,6 +32,15 @@ func TestGetURLByID(t *testing.T) {
 				statusCode: 307,
 			},
 		},
+		{
+			name: "not found",
+			request: "/2",
+			long: "http://yandex.ru",
+			want: want{
+				contentType: "text/plain",
+				statusCode: 400,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
