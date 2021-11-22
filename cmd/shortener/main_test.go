@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"github.com/lekan-pvp/incr1/internal/app/shorter"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -16,11 +17,16 @@ func TestGetURLByID(t *testing.T) {
 	tests := []struct {
 		name string
 		request string
+		id int
+		long string
+		shorts map[int]URLs
 		want want
 	}{
 		{
 			name: "success",
 			request: "/1",
+			id: 1,
+			long: "http://google.com",
 			want: want{
 				contentType: "text/plain",
 				statusCode: 307,
@@ -30,6 +36,12 @@ func TestGetURLByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for _, tt := range tests {
+				short := shorter.Shorting(1)
+				shorts[tt.id] = URLs{
+					Long: tt.long,
+					Short: short,
+				}
+
 				router := httprouter.New()
 				router.GET("/:id", GetURLByID)
 
