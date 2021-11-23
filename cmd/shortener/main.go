@@ -62,7 +62,6 @@ func GetURLByID(w http.ResponseWriter, r *http.Request, params httprouter.Params
 	w.Header().Set("Content-Type", "text/plain")
 	w.Header().Set("Location", long)
 	w.WriteHeader(http.StatusTemporaryRedirect)
-	//w.Write([]byte(""))
 }
 
 func main() {
